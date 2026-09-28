@@ -63,14 +63,10 @@ export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
 
   const scrollToCard = useCallback(
     (direction: 1 | -1) => {
-      if (isScrolling) {
-        return;
-      }
-
       const now = Date.now();
       const timeSinceLastScroll = now - lastScrollTime.current;
 
-      if (timeSinceLastScroll < MIN_SCROLL_INTERVAL) {
+      if (timeSinceLastScroll < 140) {
         return;
       }
 
@@ -84,10 +80,10 @@ export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
 
         setTimeout(() => {
           setIsScrolling(false);
-        }, transitionDuration + SCROLL_TIMEOUT_OFFSET);
+        }, 150);
       }
     },
-    [currentIndex, maxIndex, scrollY, isScrolling, transitionDuration, clamp],
+    [currentIndex, maxIndex, scrollY, clamp],
   );
 
   const goToCard = useCallback(
@@ -172,8 +168,8 @@ export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
   const handleDragEnd = useCallback(
     (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       setIsDragging(false);
-      const swipeThreshold = 35;
-      const velocityThreshold = 250;
+      const swipeThreshold = 25;
+      const velocityThreshold = 180;
 
       if (info.offset.x < -swipeThreshold || info.velocity.x < -velocityThreshold) {
         scrollToCard(1);
@@ -183,44 +179,6 @@ export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
     },
     [scrollToCard],
   );
-
-  // Native touch gesture listeners for touchscreens
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-  const touchMoved = useRef(false);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0]?.clientX ?? 0;
-    touchStartY.current = e.touches[0]?.clientY ?? 0;
-    touchMoved.current = false;
-    setIsDragging(true);
-  }, []);
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!isDragging || isScrolling) {
-        return;
-      }
-
-      const currentX = e.touches[0]?.clientX ?? 0;
-      const currentY = e.touches[0]?.clientY ?? 0;
-      const deltaX = touchStartX.current - currentX;
-      const deltaY = touchStartY.current - currentY;
-
-      // Only trigger horizontal card advance if horizontal motion dominates
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40 && !touchMoved.current) {
-        const direction = deltaX > 0 ? 1 : -1;
-        scrollToCard(direction);
-        touchMoved.current = true;
-      }
-    },
-    [isDragging, isScrolling, scrollToCard],
-  );
-
-  const handleTouchEnd = useCallback(() => {
-    setIsDragging(false);
-    touchMoved.current = false;
-  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -283,9 +241,6 @@ export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
         aria-label="Scrollable card container"
         className="relative h-full w-full touch-pan-y"
         onKeyDown={handleKeyDown}
-        onTouchEnd={handleTouchEnd}
-        onTouchMove={handleTouchMove}
-        onTouchStart={handleTouchStart}
         ref={containerRef}
         role="application"
         style={{
@@ -304,19 +259,19 @@ export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
             <motion.div
               animate={
                 shouldReduceMotion
-                  ? { x: "-50%" }
+                  ? { opacity: transform.opacity }
                   : {
                       scale: transform.scale,
-                      x: "-50%",
                       y: `calc(-50% + ${transform.y}px)`,
+                      opacity: transform.opacity,
                     }
               }
               aria-hidden={!isActive}
-              className="absolute top-1/2 left-1/2 w-full max-w-[320px] sm:max-w-[340px] overflow-hidden border border-background/25 bg-card shadow-xl transition-shadow cursor-grab active:cursor-grabbing"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-[320px] sm:max-w-[340px] overflow-hidden border border-background/25 bg-card shadow-xl transition-shadow cursor-grab active:cursor-grabbing"
               data-active={isActive}
               drag={isActive ? "x" : false}
               dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.4}
+              dragElastic={0.25}
               dragSnapToOrigin={true}
               initial={false}
               key={`scrollable-card-${item.id}`}
@@ -383,13 +338,13 @@ export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
                   <div className="absolute inset-0 bg-image-fade pointer-events-none" />
 
                   {/* Card Index Pill on Top Left */}
-                  <div className="absolute top-2.5 left-2.5 border border-background/20 bg-primary/85 px-2 py-0.5 font-mono text-[10px] font-bold text-highlight backdrop-blur-sm">
+                  {/* <div className="absolute top-2.5 left-2.5 border border-background/20 bg-primary/85 px-2 py-0.5 font-mono text-[10px] font-bold text-highlight backdrop-blur-sm">
                     {String(i + 1).padStart(2, "0")} / {String(totalItems).padStart(2, "0")}
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Info Bar at Bottom */}
-                <div
+                {/* <div
                   onClick={() => onSelectCard?.(item)}
                   className="flex items-center justify-between border-t border-background/20 bg-primary/95 p-3 text-primary-foreground backdrop-blur-sm cursor-pointer"
                 >
@@ -409,7 +364,7 @@ export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
                   >
                     <span className="text-xs font-mono font-bold">→</span>
                   </a>
-                </div>
+                </div> */}
               </div>
             </motion.div>
           );

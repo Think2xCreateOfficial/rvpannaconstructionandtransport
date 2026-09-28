@@ -154,13 +154,12 @@
     font-family: var(--font-sans);
     letter-spacing: 0;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   html {
     scroll-behavior: auto;
-    overflow-x: hidden;
-
+    overflow-x: clip;
   }
   button,
   a,
@@ -245,6 +244,224 @@
   margin-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* ────────────────────────────────────────────────────────
+   Services Section — Sticky-Scroll Card Stack
+   Exact UI/UX design matching https://www.convonite.com/#features
+
+   Architecture & Interactions:
+   • Responsive two-column flexbox on desktop (>= 1024px),
+     single-column on tablet and mobile.
+   • Left narrative pins via position: sticky on desktop.
+   • Right cards stack with natural gap (no artificial 20rem margins).
+   • Each card pins at var(--services-sticky-top) with progressive
+     z-index so subsequent cards smoothly slide over preceding ones.
+   • Multi-layered elevation shadow provides tactile card-stacking depth.
+   • Safe fallback for very short screens (landscape mobile).
+   ──────────────────────────────────────────────────────── */
+
+.services-section {
+  --services-sticky-top: 5.5rem;  /* Below fixed header (h-16/18) */
+  position: relative;
+  background-color: var(--color-background);
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+/* ─── Layout: Mobile/Tablet default (single-column) ─── */
+.services-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ─── Left Column ─── */
+.services-col-left {
+  position: relative;
+  width: 100%;
+}
+
+.services-intro-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* ─── Right Column: Card Stack (Convonite .features_cards-stack) ─── */
+.services-col-right {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+  padding-bottom: 6rem;
+}
+
+/* ─── Individual Sticky Card (Convonite .features_card) ─── */
+.services-card {
+  position: sticky;
+  top: var(--services-sticky-top);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 12px 28px -4px rgba(0, 0, 0, 0.12),
+    0 -2px 8px -1px rgba(0, 0, 0, 0.04);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  margin-bottom: 0;
+}
+
+.services-card:hover {
+  border-color: color-mix(in oklch, var(--highlight) 60%, var(--border));
+}
+
+.services-card.is-active {
+  border-color: var(--highlight);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.06),
+    0 16px 32px -4px rgba(0, 0, 0, 0.15),
+    0 0 0 1px color-mix(in oklch, var(--highlight) 35%, transparent);
+}
+
+/* ─── Card Image Wrap ─── */
+.services-card-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--primary);
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE DESIGN FOR ALL DEVICES
+   ═══════════════════════════════════════════════ */
+
+/* ─── Mobile Devices (< 640px) ─── */
+@media (max-width: 639px) {
+  .services-section {
+    --services-sticky-top: 4.5rem;
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .services-layout {
+    gap: 2rem;
+  }
+
+  .services-col-right {
+    gap: 1.5rem;
+    padding-bottom: 4rem;
+  }
+
+  .services-card {
+    border-radius: .5rem;
+  }
+
+  .services-card-image-wrap {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+/* ─── Tablet Devices (640px – 1023px) ─── */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .services-section {
+    --services-sticky-top: 5rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .services-layout {
+    gap: 2.5rem;
+  }
+
+  .services-col-right {
+    gap: 2rem;
+    padding-bottom: 5rem;
+  }
+
+  .services-card {
+    border-radius: .5rem;
+  }
+}
+
+/* ─── Desktop (≥ 1024px) — Convonite Two-Column Layout ─── */
+@media (min-width: 1024px) {
+  .services-section {
+    --services-sticky-top: 5.5rem;
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+
+  .services-layout {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 3.5rem;
+  }
+
+  /* Left column stretches to match full card stack height */
+  .services-col-left {
+    width: 42%;
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+
+  /* Left narrative sticks smoothly while all cards scroll by */
+  .services-intro-inner {
+    position: sticky;
+    top: var(--services-sticky-top);
+    width: 100%;
+    max-width: 500px;
+  }
+
+  /* Right column contains the stacked sticky cards */
+  .services-col-right {
+    width: 58%;
+    gap: 2.5rem;
+    padding-bottom: 6rem;
+  }
+
+  .services-card {
+    border-radius: .5rem;
+  }
+}
+
+/* ─── Large Desktop (≥ 1280px) ─── */
+@media (min-width: 1280px) {
+  .services-layout {
+    gap: 4.5rem;
+  }
+
+  .services-col-left {
+    width: 40%;
+  }
+
+  .services-col-right {
+    width: 60%;
+    gap: 3rem;
+    padding-bottom: 8rem;
+  }
+}
+
+/* ─── Very short screens fallback (e.g. landscape phones < 520px height) ─── */
+@media (max-height: 520px) {
+  .services-card {
+    position: relative;
+    top: auto;
+  }
+  .services-intro-inner {
+    position: relative;
+    top: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -256,4 +473,22 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  /* Remove sticky + scale/dim for reduced-motion users.
+     Cards just stack normally. No animation, but content intact. */
+  .services-card {
+    position: relative !important;
+    top: auto !important;
+    transform: none !important;
+    filter: none !important;
+    margin-bottom: 2rem;
+  }
+  .services-intro-inner {
+    position: relative !important;
+    top: auto !important;
+  }
+  .services-col-right {
+    padding-bottom: 0;
+  }
 }
+

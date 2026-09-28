@@ -9,7 +9,6 @@ const FOOTER_NAV = [
   { label: "Services", href: "#services" },
   { label: "Civil Gallery", href: "#work" },
   { label: "Materials", href: "#materials" },
-  { label: "Approach", href: "#approach" },
   { label: "Location", href: "#contact" },
   { label: "Start an Enquiry", href: "#enquire" },
 ];

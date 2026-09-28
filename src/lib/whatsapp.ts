@@ -55,7 +55,7 @@ export function buildDirectWhatsAppMessage(contextRequirement?: string): string 
   parts.push("");
   parts.push("Please contact me regarding your services.");
   parts.push("");
-  parts.push(`Date & time:\n${timestamp}`);
+  parts.push(`Sent on:\n${timestamp}`);
   parts.push("");
   parts.push("Thank you.");
 

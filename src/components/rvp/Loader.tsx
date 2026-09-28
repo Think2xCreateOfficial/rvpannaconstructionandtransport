@@ -1,71 +1,31 @@
 import { useEffect, useState, useRef } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { DotLottieReact, setWasmUrl } from "@lottiefiles/dotlottie-react";
+
+// Configure local WASM URL immediately so it never fetches from external CDN (unpkg/jsdelivr)
+if (typeof window !== "undefined") {
+  setWasmUrl("/dotlottie-player.wasm");
+}
 
 interface LoaderProps {
   onComplete: () => void;
 }
 
-type ConstructionStage =
-  "site" | "measure" | "plan" | "material" | "labour" | "build" | "move" | "complete";
-
-interface StageInfo {
-  number: string;
-  label: string;
-  descriptor: string;
-}
-
-const STAGES: Record<ConstructionStage, StageInfo> = {
-  site: {
-    number: "01",
-    label: "Site Preparation",
-    descriptor: "Setting boundary datum & site orientation",
-  },
-  measure: {
-    number: "02",
-    label: "Measure & Levels",
-    descriptor: "Structural survey grid & baseline offsets",
-  },
-  plan: {
-    number: "03",
-    label: "Architectural Plan",
-    descriptor: "2D spatial layout & 3D elevations",
-  },
-  material: {
-    number: "04",
-    label: "Material Staging",
-    descriptor: "Certified steel, cement & aggregates",
-  },
-  labour: {
-    number: "05",
-    label: "Civil Labour",
-    descriptor: "Experienced structural masonry teams",
-  },
-  build: {
-    number: "06",
-    label: "Structural Build",
-    descriptor: "RCC columns, beams & slab casting",
-  },
-  move: {
-    number: "07",
-    label: "Site Logistics",
-    descriptor: "Dedicated material transport & haulage",
-  },
-  complete: {
-    number: "—",
-    label: "RVP Anna",
-    descriptor: "Construction & Transport · Walajabad",
-  },
-};
+type LoaderPhase = "construction" | "logo";
 
 export function Loader({ onComplete }: LoaderProps) {
   const reduceMotion = useReducedMotion();
-  const [stage, setStage] = useState<ConstructionStage>("site");
+  const [phase, setPhase] = useState<LoaderPhase>("construction");
   const [isClientMounted, setIsClientMounted] = useState(false);
   const completedRef = useRef(false);
 
   useEffect(() => {
     setIsClientMounted(true);
+    // Preload official business logo asset for zero-flicker transition
+    if (typeof window !== "undefined") {
+      const img = new Image();
+      img.src = "/rvp-anna-logo.png";
+    }
   }, []);
 
   useEffect(() => {
@@ -80,26 +40,25 @@ export function Loader({ onComplete }: LoaderProps) {
       onComplete();
     };
 
-    // Sequential architectural construction progression (measured total ~2.2s)
-    const timers = [
-      setTimeout(() => setStage("measure"), 280),
-      setTimeout(() => setStage("plan"), 560),
-      setTimeout(() => setStage("material"), 840),
-      setTimeout(() => setStage("labour"), 1120),
-      setTimeout(() => setStage("build"), 1400),
-      setTimeout(() => setStage("move"), 1680),
-      setTimeout(() => {
-        setStage("complete");
-        const tEnd = setTimeout(finish, 420);
-        return () => clearTimeout(tEnd);
-      }, 1960),
-    ];
+    // Sequential timing:
+    // 0ms - 2000ms: Construction Lottie reaches completion (~2.0s)
+    // 2000ms - 2750ms: RVP Anna business logo ending sequence (~750ms)
+    // 2750ms: Reveal website (smooth exit fade)
+    // Total loader duration: ~2.8 seconds (within 2-3s target, well under 3s hard max)
+    const logoTimer = setTimeout(() => {
+      setPhase("logo");
+    }, 2000);
 
-    // Hard ceiling safety timeout (2.6s max) guarantees the user is never blocked
-    const safetyTimer = setTimeout(finish, 2600);
+    const completeTimer = setTimeout(() => {
+      finish();
+    }, 2750);
+
+    // Safety fallback timeout
+    const safetyTimer = setTimeout(finish, 3500);
 
     return () => {
-      timers.forEach((t) => clearTimeout(t));
+      clearTimeout(logoTimer);
+      clearTimeout(completeTimer);
       clearTimeout(safetyTimer);
     };
   }, [reduceMotion, onComplete]);
@@ -108,85 +67,92 @@ export function Loader({ onComplete }: LoaderProps) {
     return null;
   }
 
-  const currentStageInfo = STAGES[stage];
-
   return (
     <motion.div
-      exit={{ opacity: 0, transition: { duration: 0.4, ease: [0.76, 0, 0.24, 1] } }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#F7F5F0] text-[#071A2B] select-none"
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.35, ease: [0.76, 0, 0.24, 1] } }}
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#F7F5F0] text-[#071A2B] select-none px-4"
       role="status"
       aria-label="Loading RVP Anna Construction & Transport"
     >
-      <div className="relative flex w-full max-w-md flex-col items-center px-6 text-center">
-        {/* Architectural Lottie Construction Animation Frame */}
-        <div className="relative mb-5 h-36 sm:h-40 w-56 sm:w-64 flex items-center justify-center overflow-hidden">
-          {isClientMounted && (
-            <DotLottieReact
-              src="/Building and Construction.lottie"
-              loop
-              autoplay
-              className="size-full object-contain"
-            />
+      <div className="relative flex min-h-[190px] w-full max-w-sm flex-col items-center justify-center text-center">
+        <AnimatePresence mode="wait">
+          {phase === "construction" && (
+            <motion.div
+              key="construction"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.22 }}
+              className="flex w-full flex-col items-center"
+            >
+              {/* Construction Lottie Animation Frame - integrated without raw player controls */}
+              <div className="relative w-full max-w-[270px] sm:max-w-[300px] aspect-[600/402] flex items-center justify-center">
+                {isClientMounted ? (
+                  <DotLottieReact
+                    src="/building-construction.lottie"
+                    loop={false}
+                    autoplay
+                    speed={0.8}
+                    className="size-full object-contain pointer-events-none"
+                  />
+                ) : (
+                  <div className="flex size-full items-center justify-center">
+                    <div className="size-10 animate-pulse rounded-full border-2 border-[#D7A62A]/40 border-t-[#D7A62A]" />
+                  </div>
+                )}
+              </div>
+
+              {/* Architectural Progress Indicator */}
+              <div className="mt-4 h-1.5 w-44 sm:w-52 bg-[#071A2B]/10 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-[#D7A62A] rounded-full"
+                  initial={{ width: "15%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1.9, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </div>
+            </motion.div>
           )}
 
-          {/* Clean Brand Resolution overlay when complete */}
-          {stage === "complete" && (
+          {phase === "logo" && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
+              key="logo"
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute inset-0 flex items-center justify-center bg-[#F7F5F0]/95 backdrop-blur-xs"
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-center justify-center py-2"
             >
+              {/* Official RVP Anna Business Identity */}
               <img
                 src="/rvp-anna-logo.png"
                 alt="RVP Anna Construction & Transport"
                 width={1522}
                 height={984}
-                className="h-32 w-auto object-contain"
+                className="h-24 sm:h-32 w-auto max-w-[210px] select-none object-contain"
               />
+
+              {/* Architectural Precision Line Closure */}
+              <motion.div
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: 1, opacity: 0.75 }}
+                transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
+                className="mt-3.5 h-[1.5px] w-14 bg-[#D7A62A] origin-center"
+              />
+
+              {/* Restrained Architectural Sub-descriptor */}
+              <motion.p
+                initial={{ opacity: 0, y: 3 }}
+                animate={{ opacity: 0.75, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.18 }}
+                className="mt-2 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-[#071A2B]"
+              >
+                Civil Engineering &amp; Transport
+              </motion.p>
             </motion.div>
           )}
-        </div>
-
-        {/* Phase Indicator & Number */}
-        <div className="flex flex-col items-center">
-          <div className="flex items-center gap-2">
-            <p className="text-[11px] font-mono font-extrabold uppercase tracking-widest text-[#071A2B]">
-              {currentStageInfo.label}
-            </p>
-          </div>
-
-          <p className="mt-1.5 text-xs font-mono tracking-wider text-[#071A2B]/60">
-            {currentStageInfo.descriptor}
-          </p>
-        </div>
-
-        {/* Architectural Progress Indicator */}
-        <div className="mt-6 h-1 w-44 bg-[#071A2B]/15 overflow-hidden">
-          <motion.div
-            className="h-full bg-[#D7A62A]"
-            initial={{ width: "0%" }}
-            animate={{
-              width:
-                stage === "site"
-                  ? "14%"
-                  : stage === "measure"
-                    ? "28%"
-                    : stage === "plan"
-                      ? "42%"
-                      : stage === "material"
-                        ? "56%"
-                        : stage === "labour"
-                          ? "70%"
-                          : stage === "build"
-                            ? "84%"
-                            : stage === "move"
-                              ? "94%"
-                              : "100%",
-            }}
-            transition={{ duration: 0.25, ease: "linear" }}
-          />
-        </div>
+        </AnimatePresence>
       </div>
     </motion.div>
   );

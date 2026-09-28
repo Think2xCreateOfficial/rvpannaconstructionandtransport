@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { services, type ServiceItem } from "@/data/services";
+import { services } from "@/data/services";
+
+/** Base z-index for the first card. Each successive card increments by 1. */
+const BASE_Z_INDEX = 10;
 
 interface ServicesExplorerProps {
   onSelectService: (serviceName: string) => void;
@@ -13,51 +16,47 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
   const isScrollingByClick = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Synchronize scrolling of progressive service cards with active index on left narrative
+  /**
+   * IntersectionObserver tracks which card is currently active in the viewport
+   * to highlight the corresponding step in the left navigation.
+   */
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const observer = new IntersectionObserver(
+    const io = new IntersectionObserver(
       (entries) => {
         if (isScrollingByClick.current) return;
 
-        // Find the most visible card in the viewport
-        let maxRatio = 0;
-        let bestIndex = activeIndex;
-
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const index = cardRefs.current.indexOf(entry.target as HTMLElement);
-            if (index !== -1 && entry.intersectionRatio > maxRatio) {
-              maxRatio = entry.intersectionRatio;
-              bestIndex = index;
+            const idx = cardRefs.current.indexOf(
+              entry.target as HTMLElement,
+            );
+            if (idx !== -1) {
+              setActiveIndex(idx);
             }
           }
         });
-
-        if (maxRatio > 0.15) {
-          setActiveIndex(bestIndex);
-        }
       },
       {
-        root: null,
-        rootMargin: "-15% 0px -25% 0px",
-        threshold: [0.15, 0.35, 0.6, 0.85],
+        rootMargin: "-25% 0px -45% 0px",
+        threshold: 0,
       },
     );
 
     cardRefs.current.forEach((el) => {
-      if (el) observer.observe(el);
+      if (el) io.observe(el);
     });
 
     return () => {
-      observer.disconnect();
+      io.disconnect();
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [activeIndex]);
+  }, []);
 
+  // Click-based smooth navigation to a specific service card
   const handleNavClick = useCallback((index: number) => {
     setActiveIndex(index);
     isScrollingByClick.current = true;
@@ -68,7 +67,8 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
 
     const target = cardRefs.current[index];
     if (target) {
-      const topOffset = target.getBoundingClientRect().top + window.scrollY - 100;
+      const topOffset =
+        target.getBoundingClientRect().top + window.scrollY - 90;
       window.scrollTo({
         top: Math.max(0, topOffset),
         behavior: "smooth",
@@ -80,18 +80,22 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
     }, 750);
   }, []);
 
-  const activeService: ServiceItem = services[activeIndex] ?? services[0]!;
-
   return (
-    <section id="services" className="bg-background py-14 md:py-20 lg:py-24 border-b border-border">
+    <section
+      id="services"
+      className="services-section bg-background border-b border-border"
+    >
       <div className="container-page">
-        <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14 xl:gap-16">
-          {/* STICKY LEFT NARRATIVE COLUMN (Desktop & Laptop) */}
-          <div className="lg:sticky lg:top-28 lg:self-start flex flex-col justify-between space-y-6">
-            <div>
+        {/* Two-Column Responsive Layout (Convonite .features_content-wrap) */}
+        <div className="services-layout">
+          {/* ─── LEFT: Sticky Narrative Column (Desktop) ─── */}
+          <div className="services-col-left">
+            <div className="services-intro-inner">
               <div className="flex items-center gap-2">
                 <span className="size-2 bg-highlight-strong" />
-                <span className="eyebrow text-highlight-strong">04 / Services</span>
+                <span className="eyebrow text-highlight-strong">
+                  04 / Services
+                </span>
                 <span className="h-px w-8 bg-border" />
               </div>
 
@@ -100,9 +104,9 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
               </h2>
 
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base max-w-lg">
-                From initial 2D &amp; 3D planning to material contracts, skilled civil labour, and
-                dedicated site transport — each service is managed as a connected phase of your
-                construction project.
+                From initial 2D &amp; 3D planning to material contracts, skilled
+                civil labour, and dedicated site transport — each service is
+                managed as a connected phase of your construction project.
               </p>
 
               {/* Service Navigation List (Desktop & Tablet) */}
@@ -126,7 +130,6 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
                       }`}
                       aria-current={isActive ? "step" : undefined}
                     >
-                      {/* Active indicator dot */}
                       <span
                         className={`absolute -left-[21px] size-2 transition-all duration-300 ${
                           isActive
@@ -136,7 +139,6 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
                               : "bg-border"
                         }`}
                       />
-
                       <span className="font-mono text-xs font-bold text-highlight-strong">
                         {service.number}
                       </span>
@@ -150,8 +152,8 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
             </div>
           </div>
 
-          {/* PROGRESSIVE RIGHT SERVICE CARDS */}
-          <div className="space-y-8 md:space-y-12 lg:space-y-16">
+          {/* ─── RIGHT: Sticky Card Stack (Convonite .features_cards-stack) ─── */}
+          <div className="services-col-right features_cards-stack" role="list">
             {services.map((service, index) => {
               const isActive = activeIndex === index;
 
@@ -162,11 +164,13 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
                     cardRefs.current[index] = el;
                   }}
                   id={`service-${service.id}`}
-                  className={`group relative overflow-hidden border bg-card transition-all duration-300 ${
-                    isActive
-                      ? "border-highlight ring-1 ring-highlight/30 shadow-md"
-                      : "border-border/80 opacity-95 hover:border-border hover:opacity-100"
-                  }`}
+                  role="listitem"
+                  className={`services-card features_card is-${index + 1} ${isActive ? "is-active" : ""}`}
+                  style={{
+                    position: "sticky",
+                    top: "var(--services-sticky-top)",
+                    zIndex: BASE_Z_INDEX + index,
+                  }}
                 >
                   {/* Card Header Bar */}
                   <div className="flex items-center justify-between border-b border-border bg-secondary/50 px-4 py-2.5 sm:px-5 sm:py-3">
@@ -178,27 +182,26 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
                         {service.label}
                       </span>
                     </div>
-
-                    <span className="hidden sm:inline-block font-mono text-[11px] text-muted-foreground">
+                    {/* <span className="hidden sm:inline-block font-mono text-[11px] text-muted-foreground">
                       {service.scopeMeta.split("·")[0]}
-                    </span>
+                    </span> */}
                   </div>
 
-                  {/* Dominant Construction Image */}
-                  <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden bg-primary">
+                  {/* Construction Image */}
+                  <div className="services-card-image-wrap">
                     <img
                       src={service.image}
                       alt={`RVP Anna Construction service: ${service.title}`}
                       width={1536}
                       height={864}
-                      loading="lazy"
+                      loading={index <= 1 ? "eager" : "lazy"}
                       className="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
                     />
                     <div className="absolute inset-0 bg-image-fade" />
                   </div>
 
-                  {/* Card Content & Action Area */}
-                  <div className="p-4 sm:p-5 md:p-7">
+                  {/* Card Content & Action */}
+                  <div className="p-4 sm:p-5 md:p-6">
                     <h3 className="text-base font-bold tracking-tight text-foreground sm:text-lg md:text-xl">
                       {service.title}
                     </h3>

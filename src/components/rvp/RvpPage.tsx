@@ -21,6 +21,8 @@ export function RvpPage() {
   const [showLoader, setShowLoader] = useState(!reduceMotion);
 
   const handleStartEnquiry = (requirement = "") => {
+    setMenuOpen(false);
+    document.body.style.overflow = "";
     if (requirement) {
       setSelectedNeed(requirement);
     }
@@ -36,7 +38,7 @@ export function RvpPage() {
       <Header open={menuOpen} setOpen={setMenuOpen} onEnquire={() => handleStartEnquiry()} />
 
       <main id="top" className="min-w-0">
-        <Hero onStartProject={() => handleStartEnquiry()} />
+        <Hero onStartProject={() => handleStartEnquiry()} shouldLoadVideo={!showLoader} />
         <RequirementSelector onSelectRequirement={handleStartEnquiry} />
         <BuildMoveSection />
         <ServicesExplorer onSelectService={handleStartEnquiry} />
@@ -46,7 +48,7 @@ export function RvpPage() {
         {/* Enquiry Section */}
         <section
           id="enquire"
-          className="bg-primary-soft py-14 md:py-20 lg:py-24 border-b border-background/15"
+          className="bg-primary-soft py-14 md:py-20 lg:py-24 border-b border-background/15 scroll-mt-20"
         >
           <div className="container-page">
             <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">

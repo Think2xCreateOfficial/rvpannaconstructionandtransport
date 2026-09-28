@@ -176,11 +176,10 @@ function PureImageCard({
     <Wrapper className="w-full">
       <div
         onClick={onClick}
-        className={`group relative overflow-hidden border bg-primary-soft transition-all duration-300 cursor-pointer ${
-          isActive
+        className={`group relative overflow-hidden border bg-primary-soft transition-all duration-300 cursor-pointer ${isActive
             ? "border-highlight ring-1 ring-highlight/40 shadow-lg"
             : "border-background/20 hover:border-highlight/60"
-        }`}
+          }`}
       >
         <div className={`relative ${aspectClass} w-full overflow-hidden bg-primary`}>
           <img

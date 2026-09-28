@@ -11,4 +11,8 @@ export default defineConfig({
     tanstackStart(),
     react(),
   ],
+  server: {
+    allowedHosts: true,
+    host: true
+  }
 });

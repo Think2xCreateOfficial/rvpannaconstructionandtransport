@@ -8,17 +8,18 @@ import { siteConfig } from "@/data/siteConfig";
 
 interface HeroProps {
   onStartProject: () => void;
+  shouldLoadVideo?: boolean;
 }
 
-export function Hero({ onStartProject }: HeroProps) {
+export function Hero({ onStartProject, shouldLoadVideo = true }: HeroProps) {
   const reduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
 
   useEffect(() => {
-    if (reduceMotion) {
-      setVideoFailed(true);
+    if (reduceMotion || !shouldLoadVideo) {
+      if (reduceMotion) setVideoFailed(true);
       return;
     }
 
@@ -35,7 +36,7 @@ export function Hero({ onStartProject }: HeroProps) {
           setVideoFailed(true);
         });
     }
-  }, [reduceMotion]);
+  }, [reduceMotion, shouldLoadVideo]);
 
   return (
     <section className="relative min-h-[100svh] overflow-hidden bg-primary text-primary-foreground">
@@ -50,8 +51,8 @@ export function Hero({ onStartProject }: HeroProps) {
         className="absolute inset-0 size-full object-cover"
       />
 
-      {/* Construction Video Hero (muted, autoplay, playsInline) */}
-      {!reduceMotion && !videoFailed && (
+      {/* Construction Video Hero (only loaded after loader to protect mobile bandwidth) */}
+      {!reduceMotion && !videoFailed && shouldLoadVideo && (
         <video
           ref={videoRef}
           src="/site-construction.mp4"
@@ -60,7 +61,7 @@ export function Hero({ onStartProject }: HeroProps) {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           onCanPlay={() => setVideoReady(true)}
           onError={() => setVideoFailed(true)}
           className={`absolute inset-0 size-full object-cover transition-opacity duration-1000 ${
