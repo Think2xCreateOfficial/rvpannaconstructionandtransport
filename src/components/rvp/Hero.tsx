@@ -77,11 +77,23 @@ export function Hero({ onStartProject, shouldLoadVideo = true }: HeroProps) {
       {/* Hero Content */}
       <div className="container-page relative flex min-h-[100svh] flex-col justify-end pb-16 pt-28 md:pb-20">
         <div className="max-w-4xl">
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="flex items-center gap-2"
+          >
+            <span className="size-2 bg-highlight" />
+            <p className="eyebrow text-highlight font-mono">
+              RVP Anna Construction &amp; Transport · Walajabad &amp; Kanchipuram
+            </p>
+          </motion.div>
+
           <motion.h1
             initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.6 }}
-            className="mt-5 text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-primary-foreground"
+            className="mt-4 text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-primary-foreground"
           >
             Build with clarity.
             <br />
@@ -94,8 +106,9 @@ export function Hero({ onStartProject, shouldLoadVideo = true }: HeroProps) {
             transition={{ delay: 0.25, duration: 0.6 }}
             className="mt-6 max-w-2xl text-base leading-relaxed text-primary-foreground/85 md:text-lg"
           >
-            Civil construction planning, execution support, material supply, and site transport for
-            residential and commercial projects in and around Kanchipuram.
+            Civil engineering construction planning, structural execution, building materials, and
+            site transport for residential and commercial projects in Walajabad, Kanchipuram, and
+            surrounding areas.
           </motion.p>
 
           <motion.div

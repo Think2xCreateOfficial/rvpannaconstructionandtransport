@@ -87,7 +87,7 @@ export function MaterialsSection({ onSelectMaterials }: MaterialsSectionProps) {
   return (
     <section
       id="materials"
-      className="bg-secondary py-14 text-foreground md:py-20 lg:py-24 border-b border-border"
+      className="bg-secondary py-14 text-foreground md:py-20 lg:py-24 border-b border-border scroll-mt-20"
     >
       <div className="container-page">
         {/* Section Header */}
@@ -95,7 +95,7 @@ export function MaterialsSection({ onSelectMaterials }: MaterialsSectionProps) {
           <div>
             <div className="flex items-center gap-2">
               <span className="size-2 bg-highlight-strong" />
-              <span className="eyebrow text-highlight-strong">06 / Materials</span>
+              <span className="eyebrow text-highlight-strong">Construction Materials</span>
             </div>
             <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl md:text-4xl lg:text-5xl">
               Civil building materials.

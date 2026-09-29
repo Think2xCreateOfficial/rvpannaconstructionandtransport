@@ -27,9 +27,9 @@ export const galleryItems: GalleryItem[] = [
     category: "Structure & Masonry",
     label: "Construction Work",
     location: "Walajabad & Kanchipuram",
-    scope: "Foundation, RCC Columns, Brickwork & Slab",
+    scope: "Foundation, Pillars, Brickwork & Slab",
     description:
-      "On-site civil execution with continuous engineering supervision from foundation footings to roof slab casting.",
+      "On-site civil construction work with continuous engineering supervision from foundation footings to roof slab casting.",
     image: workImage,
     aspectClass: "aspect-[3/4] sm:aspect-[4/5]",
   },
@@ -42,7 +42,7 @@ export const galleryItems: GalleryItem[] = [
     location: "Kanchipuram District",
     scope: "Floor Plans, 3D Elevation & Exterior Views",
     description:
-      "Visualizing structural volumes, modern front elevations, and natural daylight flow before site excavation.",
+      "Visualizing room sizes, front elevation design, and natural daylight flow before site excavation.",
     image: plan3dImage,
     aspectClass: "aspect-square sm:aspect-[4/3]",
   },
@@ -55,7 +55,7 @@ export const galleryItems: GalleryItem[] = [
     location: "Walajabad & Kanchipuram",
     scope: "Rebar Footings, Columns & Lintel Beams",
     description:
-      "TMT steel rebar integration providing tensile strength and load distribution for all structural members.",
+      "TMT steel reinforcement providing strength and load support for footings, pillars, and beams.",
     image: steelImage,
     aspectClass: "aspect-square sm:aspect-[4/3]",
   },
@@ -68,7 +68,7 @@ export const galleryItems: GalleryItem[] = [
     location: "Kanchipuram District",
     scope: "Dimensional Drawings & Room Layouts",
     description:
-      "Precise room dimensions and site orientations planned for optimal circulation, ventilation, and living comfort.",
+      "Precise room dimensions and site orientations planned for smooth movement, ventilation, and family living comfort.",
     image: plan2dImage,
     aspectClass: "aspect-[16/10]",
   },
@@ -81,7 +81,7 @@ export const galleryItems: GalleryItem[] = [
     location: "Walajabad & Kanchipuram",
     scope: "Concrete Mixtures, Bricklaying & Plastering",
     description:
-      "Consistent mixture grading and proper water curing to ensure long-term structural integrity and weather resistance.",
+      "Proper concrete mix proportions and water curing to ensure lasting structural strength and weather protection.",
     image: cementImage,
     aspectClass: "aspect-[16/10]",
   },
@@ -92,9 +92,9 @@ export const galleryItems: GalleryItem[] = [
     category: "Transport & Logistics",
     label: "Transport Support",
     location: "Walajabad & Kanchipuram",
-    scope: "Direct Site Supply & Vehicle Haulage",
+    scope: "Direct Site Supply & Vehicle Transport",
     description:
-      "Dedicated transport support delivering key structural materials directly to project sites without delays.",
+      "Dedicated transport support delivering construction materials directly to project sites on schedule.",
     image: transportImage,
     aspectClass: "aspect-[16/10]",
   },

@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://rvpannabuilder.com/sitemap.xml
+Sitemap: https://www.rvpannaconstructionandtransport.com/sitemap.xml

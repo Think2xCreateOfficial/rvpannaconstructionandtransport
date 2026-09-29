@@ -44,14 +44,19 @@ export function NotFoundPage() {
           </div>
 
           <div className="flex items-center justify-center gap-2">
-            <p className="eyebrow text-highlight font-mono">404 · Unmapped Location</p>
+            <p className="eyebrow text-highlight font-mono">404</p>
           </div>
 
           <h1 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl md:text-4xl text-primary-foreground">
             Page Not Found
           </h1>
 
-          <div className="mx-auto mt-3 h-0.5 w-12 bg-highlight" />
+          <p className="mt-3 text-sm text-primary-foreground/75 leading-relaxed">
+            The page you are looking for could not be found. Return to the homepage or start a
+            project enquiry.
+          </p>
+
+          <div className="mx-auto mt-4 h-0.5 w-12 bg-highlight" />
 
           {/* Action CTAs (Touch friendly, >=44px) */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">

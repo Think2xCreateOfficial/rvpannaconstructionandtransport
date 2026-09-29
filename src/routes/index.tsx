@@ -1,40 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RvpPage } from "@/components/rvp/RvpPage";
+import { siteConfig } from "@/data/siteConfig";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title: "RVP Anna Construction & Transport | Construction Services in Kanchipuram",
+        title: siteConfig.title,
       },
       {
         name: "description",
-        content:
-          "Civil engineering construction, architectural 2D & 3D planning, elevation design, building material supply, labour coordination, and site transport in Walajabad and Kanchipuram.",
+        content: siteConfig.description,
       },
       {
         property: "og:title",
-        content: "RVP Anna Construction & Transport | Build with Clarity. Move with Confidence.",
+        content: siteConfig.title,
       },
       {
         property: "og:description",
-        content:
-          "Civil construction execution, architectural planning, material contracts, skilled labour, and site transport in Kanchipuram & Walajabad.",
+        content: siteConfig.description,
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "/rvp-anna-logo.png" },
-      { property: "og:url", content: "https://rvpannabuilder.com/" },
+      { property: "og:image", content: siteConfig.ogImage },
+      { property: "og:url", content: siteConfig.url },
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "RVP Anna Construction & Transport",
+        content: siteConfig.title,
       },
       {
         name: "twitter:description",
-        content:
-          "Civil engineering construction execution and transport services in Kanchipuram and Walajabad.",
+        content: siteConfig.description,
       },
-      { name: "twitter:image", content: "/rvp-anna-logo.png" },
+      { name: "twitter:image", content: siteConfig.ogImage },
     ],
   }),
   component: RvpPage,

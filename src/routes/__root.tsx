@@ -8,33 +8,8 @@ import {
 } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import { NotFoundPage } from "@/components/rvp/NotFoundPage";
-import { siteConfig } from "@/data/siteConfig";
+import { siteConfig, businessStructuredData } from "@/data/siteConfig";
 import appCss from "../styles.css?url";
-
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  name: siteConfig.name,
-  alternateName: siteConfig.shortName,
-  image: "https://rvpannabuilder.com/rvp-anna-logo.png",
-  description:
-    "Civil engineering construction execution, architectural 2D/3D planning, elevation design, building material supply, skilled labour coordination, and dedicated site transport services in Walajabad and Kanchipuram.",
-  telephone: siteConfig.phoneRaw,
-  founder: {
-    "@type": "Person",
-    name: siteConfig.proprietor,
-    jobTitle: siteConfig.professionalTitle,
-  },
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Ganapathipuram Avalur (Pt), Walajabad (Tk)",
-    addressLocality: "Kanchipuram",
-    addressRegion: "Tamil Nadu",
-    addressCountry: "IN",
-  },
-  areaServed: ["Walajabad", "Kanchipuram", "Tamil Nadu"],
-  url: "https://rvpannabuilder.com",
-};
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error("Application Error Boundary caught error:", error);
@@ -79,39 +54,39 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
-        title: "RVP Anna Construction & Transport | Construction Services in Kanchipuram",
+        title: siteConfig.title,
       },
       {
         name: "description",
-        content:
-          "Civil engineering construction, architectural 2D/3D planning, elevation design, building material supply, labour coordination, and site transport in Walajabad and Kanchipuram.",
+        content: siteConfig.description,
       },
-      { name: "author", content: "P Arunachalam · RVP Anna Construction & Transport" },
+      { name: "author", content: `${siteConfig.proprietor} · ${siteConfig.name}` },
       { name: "theme-color", content: "#071A2B" },
       { property: "og:type", content: "website" },
+      { property: "og:locale", content: "en_IN" },
       { property: "og:site_name", content: siteConfig.name },
       {
         property: "og:title",
-        content: "RVP Anna Construction & Transport | Construction & Civil Engineering",
+        content: siteConfig.title,
       },
       {
         property: "og:description",
-        content:
-          "Build with clarity. Move with confidence. Civil construction, architectural planning, material coordination, labour, and transport in Kanchipuram.",
+        content: siteConfig.description,
       },
-      { property: "og:image", content: "/rvp-anna-logo.png" },
-      { property: "og:url", content: "https://rvpannabuilder.com/" },
+      { property: "og:image", content: siteConfig.ogImage },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:url", content: siteConfig.url },
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "RVP Anna Construction & Transport",
+        content: siteConfig.title,
       },
       {
         name: "twitter:description",
-        content:
-          "Construction planning, materials, labour, and transport services in Walajabad, Kanchipuram.",
+        content: siteConfig.description,
       },
-      { name: "twitter:image", content: "/rvp-anna-logo.png" },
+      { name: "twitter:image", content: siteConfig.ogImage },
     ],
     links: [
       {
@@ -128,12 +103,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "alternate icon", href: "/favicon.ico" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "manifest", href: "/site.webmanifest" },
-      { rel: "canonical", href: "https://rvpannabuilder.com/" },
+      { rel: "canonical", href: siteConfig.url },
     ],
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(structuredData),
+        children: JSON.stringify(businessStructuredData),
       },
     ],
   }),

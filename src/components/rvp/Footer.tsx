@@ -7,9 +7,11 @@ import { getDirectWhatsAppUrl } from "@/lib/whatsapp";
 const FOOTER_NAV = [
   { label: "Home", href: "#top" },
   { label: "Services", href: "#services" },
+  { label: "Our Approach", href: "#approach" },
   { label: "Civil Gallery", href: "#work" },
   { label: "Materials", href: "#materials" },
-  { label: "Location", href: "#contact" },
+  { label: "About RVP Anna", href: "#about" },
+  { label: "Contact", href: "#contact" },
   { label: "Start an Enquiry", href: "#enquire" },
 ];
 
@@ -32,9 +34,8 @@ export function Footer() {
             <div>
               <BrandMark inverse />
               <p className="mt-5 max-w-sm text-xs md:text-sm leading-relaxed text-primary-foreground/75">
-                Civil construction execution, architectural planning, building material supply,
-                skilled labour coordination, and dedicated site transport in Walajabad and
-                Kanchipuram.
+                Civil construction work, architectural planning, building material supply, skilled
+                labour, and site transport in Walajabad and Kanchipuram.
               </p>
             </div>
           </div>

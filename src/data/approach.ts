@@ -25,7 +25,7 @@ export const approachSteps: ApproachStep[] = [
     title: "Prepare",
     subtitle: "Materials & Labour Setup",
     description:
-      "Quality TMT steel, cement, M-sand, jelly gravel, and skilled masonry teams are scheduled to ensure site work starts without delay.",
+      "Quality TMT steel, cement, M-sand, Jalli gravel, and skilled masonry teams are scheduled to ensure site work starts without delay.",
   },
   {
     number: "04",
@@ -66,7 +66,7 @@ export const journeyStages: JourneyStage[] = [
     name: "Material",
     tagline: "Quality Supplies",
     description:
-      "TMT steel, cement, graded sand, jelly aggregate, and blocks sourced directly for your site.",
+      "TMT steel, cement, graded sand, Jalli aggregate, and blocks sourced directly for your site.",
   },
   {
     id: "labour",

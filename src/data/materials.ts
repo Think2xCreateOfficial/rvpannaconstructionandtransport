@@ -22,8 +22,8 @@ export const materials: MaterialDetailItem[] = [
     name: "Steel",
     tagline: "Structural Reinforcement",
     description:
-      "TMT steel rebar provides the internal tensile strength for all concrete elements. It reinforces footings, columns, lintels, and roof slabs against cracking and load stress.",
-    usage: "Foundations, Columns, Beams & Roof Slabs",
+      "TMT steel rods give tensile strength to all structural parts of your building, reinforcing footings, pillars, beams, and roof slabs against load stress.",
+    usage: "Foundations, Pillars, Beams & Roof Slabs",
     image: steelImage,
   },
   {
@@ -32,7 +32,7 @@ export const materials: MaterialDetailItem[] = [
     name: "Cement",
     tagline: "Binding & Durability",
     description:
-      "The core bonding agent for all RCC concrete mixtures, bricklaying mortar, and internal/external wall plastering. Proper curing ensures long-term weather resistance.",
+      "Essential bonding agent for solid concrete casting, brickwork mortar, and wall plastering to ensure lasting strength and weather protection.",
     usage: "Concrete Casting, Brickwork & Plastering",
     image: cementImage,
   },
@@ -42,17 +42,17 @@ export const materials: MaterialDetailItem[] = [
     name: "M-Sand",
     tagline: "Fine Aggregate Support",
     description:
-      "Manufactured sand produced with clean particle sizing for solid concrete mixes, foundation beds, and mortar bonding in place of river sand.",
-    usage: "RCC Structural Concrete & Masonry Mortar",
+      "Manufactured sand with uniform particle grading for strong concrete mixes, brickwork mortar, and foundation beds.",
+    usage: "Structural Concrete & Brickwork Mortar",
     image: msandImage,
   },
   {
     id: "jelly",
     number: "04",
-    name: "Jelly",
+    name: "Jelly (Jalli)",
     tagline: "Coarse Blue Metal Aggregate",
     description:
-      "Hard blue metal crushed stone gravel used as the primary aggregate in concrete, providing compressive strength and load distribution for all structural members.",
+      "Clean blue metal stone gravel used in concrete mixtures for foundation footings, pillars, beams, and roof slab casting.",
     usage: "Pillar Castings, Lintels, Footings & Roof Slabs",
     image: jellyImage,
   },
@@ -62,8 +62,8 @@ export const materials: MaterialDetailItem[] = [
     name: "AAC Blocks",
     tagline: "Lightweight Wall Units",
     description:
-      "Autoclaved aerated concrete blocks offer faster wall construction, reduced dead weight on structural frames, and better thermal comfort inside rooms.",
-    usage: "External Walls, Partition Walls & Multi-Storey Builds",
+      "Lightweight building blocks for fast wall construction, reducing structural load on pillars while offering good room insulation.",
+    usage: "External Walls & Partition Walls",
     image: aacBlocksImage,
   },
   {
@@ -72,8 +72,8 @@ export const materials: MaterialDetailItem[] = [
     name: "AAC Jointing Mortar",
     tagline: "Thin-Bed Block Adhesive",
     description:
-      "Special thin-bed mortar designed for joining AAC blocks. It requires minimal joint thickness, eliminates thick sand-cement beds, and reduces joint shrinkage.",
-    usage: "AAC Block Masonry & Precision Jointing",
+      "Adhesive mortar formulated specifically for AAC blocks, creating thin, strong joints without thick cement beds.",
+    usage: "AAC Block Masonry & Jointing",
     image: aacMortarImage,
   },
 ];

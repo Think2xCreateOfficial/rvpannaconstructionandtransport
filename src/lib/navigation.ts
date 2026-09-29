@@ -13,8 +13,7 @@ export function scrollToSection(
   document.body.style.overflow = "";
 
   const cleanId = targetId.startsWith("#") ? targetId.slice(1) : targetId;
-  const element =
-    document.getElementById(cleanId) || document.querySelector(targetId);
+  const element = document.getElementById(cleanId) || document.querySelector(targetId);
 
   if (!element) return;
 

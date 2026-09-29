@@ -260,7 +260,7 @@
    ──────────────────────────────────────────────────────── */
 
 .services-section {
-  --services-sticky-top: 5.5rem;  /* Below fixed header (h-16/18) */
+  --services-sticky-top: 5.5rem; /* Below fixed header (h-16/18) */
   position: relative;
   background-color: var(--color-background);
   padding-top: 3.5rem;
@@ -307,7 +307,7 @@
   flex-direction: column;
   background-color: var(--card);
   border: 1px solid var(--border);
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   overflow: hidden;
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.05),
@@ -362,7 +362,7 @@
   }
 
   .services-card {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 
   .services-card-image-wrap {
@@ -388,7 +388,7 @@
   }
 
   .services-card {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 }
 
@@ -429,7 +429,7 @@
   }
 
   .services-card {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 }
 
@@ -491,4 +491,3 @@
     padding-bottom: 0;
   }
 }
-

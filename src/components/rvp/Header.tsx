@@ -13,8 +13,10 @@ interface HeaderProps {
 
 const NAV_ITEMS = [
   { label: "Services", href: "#services" },
-  { label: "Gallery", href: "#work" },
+  { label: "Our Approach", href: "#approach" },
+  { label: "Work", href: "#work" },
   { label: "Materials", href: "#materials" },
+  { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -83,7 +85,7 @@ export function Header({ open, setOpen, onEnquire }: HeaderProps) {
         <BrandMark inverse={!isLightNav} />
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-3.5 lg:flex xl:gap-5" aria-label="Main navigation">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
@@ -157,11 +159,7 @@ export function Header({ open, setOpen, onEnquire }: HeaderProps) {
 
               {/* Direct Start a Project in Mobile Menu */}
               <div className="mt-4 flex flex-col gap-2.5 pt-2">
-                <Button
-                  variant="gold"
-                  className="mt-2 w-full"
-                  onClick={handleStartProject}
-                >
+                <Button variant="gold" className="mt-2 w-full" onClick={handleStartProject}>
                   Start a project
                 </Button>
               </div>

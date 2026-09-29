@@ -19,7 +19,7 @@ export function RequirementSelector({ onSelectRequirement }: RequirementSelector
               What are you planning?
             </h2>
             <p className="mt-3 max-w-sm text-sm text-muted-foreground leading-relaxed">
-              Select what you are looking for to jump directly into a structured discussion.
+              Select what you need below to tell us about your project.
             </p>
           </div>
 

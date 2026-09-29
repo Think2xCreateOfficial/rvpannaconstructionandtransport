@@ -30,14 +30,14 @@ export function WorkShowcase({ onSelectProject }: WorkShowcaseProps) {
   return (
     <section
       id="work"
-      className="bg-primary py-14 text-primary-foreground md:py-20 lg:py-24 border-b border-background/15 overflow-hidden"
+      className="bg-primary py-14 text-primary-foreground md:py-20 lg:py-24 border-b border-background/15 overflow-hidden scroll-mt-20"
     >
       <div className="container-page">
         {/* Section Header with Intro & CTA */}
         <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="font-mono text-xs font-bold uppercase tracking-widest text-highlight">
-              Site &amp; Execution Visuals
+              Construction Gallery · Site Visuals
             </p>
             <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-primary-foreground sm:text-3xl md:text-4xl lg:text-5xl">
               See the work in motion.
@@ -46,8 +46,8 @@ export function WorkShowcase({ onSelectProject }: WorkShowcaseProps) {
 
           <div className="max-w-md flex flex-col sm:flex-row sm:items-center gap-4">
             <p className="text-xs leading-relaxed text-primary-foreground/80 sm:text-sm">
-              A visual record of structural execution, site preparation, reinforced foundations, and
-              site logistics in Kanchipuram and Walajabad.
+              A visual record of structural work, site preparation, foundation reinforcement, and
+              material transport around Walajabad and Kanchipuram.
             </p>
           </div>
         </div>
@@ -176,10 +176,11 @@ function PureImageCard({
     <Wrapper className="w-full">
       <div
         onClick={onClick}
-        className={`group relative overflow-hidden border bg-primary-soft transition-all duration-300 cursor-pointer ${isActive
+        className={`group relative overflow-hidden border bg-primary-soft transition-all duration-300 cursor-pointer ${
+          isActive
             ? "border-highlight ring-1 ring-highlight/40 shadow-lg"
             : "border-background/20 hover:border-highlight/60"
-          }`}
+        }`}
       >
         <div className={`relative ${aspectClass} w-full overflow-hidden bg-primary`}>
           <img

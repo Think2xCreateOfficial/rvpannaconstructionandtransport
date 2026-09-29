@@ -51,9 +51,7 @@ export function buildDirectWhatsAppMessage(contextRequirement?: string): string 
   }
 
   parts.push("");
-  parts.push("I found RVP Anna Construction & Transport through your website.");
-  parts.push("");
-  parts.push("Please contact me regarding your services.");
+  parts.push("Please contact me.");
   parts.push("");
   parts.push(`Sent on:\n${timestamp}`);
   parts.push("");
@@ -106,9 +104,7 @@ export function buildWhatsAppMessage(payload: EnquiryPayload): string {
   parts.push("");
   parts.push("Please contact me.");
   parts.push("");
-  parts.push(`Phone:\n${siteConfig.phone}`);
-  parts.push("");
-  parts.push(`Enquiry sent:\n${timestamp}`);
+  parts.push(`Sent on:\n${timestamp}`);
 
   return parts.join("\n");
 }

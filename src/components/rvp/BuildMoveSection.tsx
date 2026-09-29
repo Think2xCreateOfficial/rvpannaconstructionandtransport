@@ -4,7 +4,10 @@ import { SlideInLeft, SlideInRight } from "./Motion";
 
 export function BuildMoveSection() {
   return (
-    <section id="about" className="grid lg:grid-cols-2 border-b border-border overflow-hidden">
+    <section
+      id="capabilities"
+      className="grid lg:grid-cols-2 border-b border-border overflow-hidden scroll-mt-20"
+    >
       {/* BUILD SIDE (Slide in from Left) */}
       <div className="flex min-h-[420px] flex-col justify-between bg-primary p-8 text-primary-foreground md:p-12 lg:min-h-[480px]">
         <SlideInLeft>
@@ -58,7 +61,7 @@ export function BuildMoveSection() {
             <div className="mt-3 h-0.5 w-12 bg-highlight" />
             <p className="mt-5 max-w-md text-sm md:text-base leading-relaxed text-primary-foreground/80">
               Transport is an essential part of keeping a construction site productive. Dedicated
-              vehicle support ensures steel, cement, jelly, and sand reach the site on schedule.
+              vehicle support ensures steel, cement, Jelly, and sand reach the site on schedule.
             </p>
           </div>
         </SlideInRight>

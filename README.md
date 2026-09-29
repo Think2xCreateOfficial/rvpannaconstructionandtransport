@@ -142,7 +142,7 @@ Construction materials shown in their existing material-planning artwork:
 
 • M-Sand
 
-• Jelly
+• Jalli
 
 • AAC Blocks
 
@@ -976,7 +976,7 @@ CEMENT
 
 M-SAND
 
-JELLY
+Jalli
 
 AAC BLOCKS
 

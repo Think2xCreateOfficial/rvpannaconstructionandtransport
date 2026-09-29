@@ -11,7 +11,10 @@ export function LocationSection() {
   };
 
   return (
-    <section id="contact" className="bg-background py-14 md:py-20 lg:py-24 border-t border-border">
+    <section
+      id="contact"
+      className="bg-background py-14 md:py-20 lg:py-24 border-t border-border scroll-mt-20"
+    >
       <div className="container-page grid gap-10 lg:grid-cols-2 lg:gap-14">
         <div>
           <div className="flex items-center gap-2">
@@ -24,8 +27,8 @@ export function LocationSection() {
           </h2>
 
           <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground md:text-base">
-            Operating across Kanchipuram district with direct proprietor contact, on-site civil
-            evaluations, and scheduled material transport to your site.
+            Operating across Walajabad and Kanchipuram district with direct proprietor contact,
+            on-site engineering visits, and scheduled material transport to your site.
           </p>
         </div>
 

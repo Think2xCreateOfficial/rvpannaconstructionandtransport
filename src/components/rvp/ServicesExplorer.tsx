@@ -29,9 +29,7 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
 
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const idx = cardRefs.current.indexOf(
-              entry.target as HTMLElement,
-            );
+            const idx = cardRefs.current.indexOf(entry.target as HTMLElement);
             if (idx !== -1) {
               setActiveIndex(idx);
             }
@@ -67,8 +65,7 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
 
     const target = cardRefs.current[index];
     if (target) {
-      const topOffset =
-        target.getBoundingClientRect().top + window.scrollY - 90;
+      const topOffset = target.getBoundingClientRect().top + window.scrollY - 90;
       window.scrollTo({
         top: Math.max(0, topOffset),
         behavior: "smooth",
@@ -83,7 +80,7 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
   return (
     <section
       id="services"
-      className="services-section bg-background border-b border-border"
+      className="services-section bg-background border-b border-border scroll-mt-20"
     >
       <div className="container-page">
         {/* Two-Column Responsive Layout (Convonite .features_content-wrap) */}
@@ -93,9 +90,7 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
             <div className="services-intro-inner">
               <div className="flex items-center gap-2">
                 <span className="size-2 bg-highlight-strong" />
-                <span className="eyebrow text-highlight-strong">
-                  04 / Services
-                </span>
+                <span className="eyebrow text-highlight-strong">Construction Services</span>
                 <span className="h-px w-8 bg-border" />
               </div>
 
@@ -104,9 +99,9 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
               </h2>
 
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base max-w-lg">
-                From initial 2D &amp; 3D planning to material contracts, skilled
-                civil labour, and dedicated site transport — each service is
-                managed as a connected phase of your construction project.
+                From initial 2D &amp; 3D planning to material contracts, skilled civil labour, and
+                dedicated site transport — each service is managed as a connected phase of your
+                construction project.
               </p>
 
               {/* Service Navigation List (Desktop & Tablet) */}
@@ -191,7 +186,7 @@ export function ServicesExplorer({ onSelectService }: ServicesExplorerProps) {
                   <div className="services-card-image-wrap">
                     <img
                       src={service.image}
-                      alt={`RVP Anna Construction service: ${service.title}`}
+                      alt={`${service.title} - ${service.label}`}
                       width={1536}
                       height={864}
                       loading={index <= 1 ? "eager" : "lazy"}

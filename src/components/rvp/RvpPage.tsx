@@ -44,7 +44,6 @@ export function RvpPage() {
         <ServicesExplorer onSelectService={handleStartEnquiry} />
         <WorkShowcase onSelectProject={(title) => handleStartEnquiry(title)} />
         <MaterialsSection onSelectMaterials={() => handleStartEnquiry("Materials")} />
-
         {/* Enquiry Section */}
         <section
           id="enquire"
