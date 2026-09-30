@@ -1,7 +1,7 @@
 import steelImage from "@/assets/material-steel.jpg";
 import cementImage from "@/assets/material-cement.jpg";
 import msandImage from "@/assets/material-msand.jpg";
-import jellyImage from "@/assets/material-jelly.jpg";
+import jalliImage from "@/assets/material-jalli.jpg";
 import aacBlocksImage from "@/assets/material-aac-blocks.jpg";
 import aacMortarImage from "@/assets/material-aac-mortar.jpg";
 
@@ -47,14 +47,14 @@ export const materials: MaterialDetailItem[] = [
     image: msandImage,
   },
   {
-    id: "jelly",
+    id: "jalli",
     number: "04",
-    name: "Jelly (Jalli)",
+    name: "Jalli",
     tagline: "Coarse Blue Metal Aggregate",
     description:
       "Clean blue metal stone gravel used in concrete mixtures for foundation footings, pillars, beams, and roof slab casting.",
     usage: "Pillar Castings, Lintels, Footings & Roof Slabs",
-    image: jellyImage,
+    image: jalliImage,
   },
   {
     id: "aac-blocks",

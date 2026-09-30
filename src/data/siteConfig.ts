@@ -28,7 +28,7 @@ export interface BusinessInfo {
 }
 
 export const siteConfig: BusinessInfo = {
-  name: "RVP ANNA CONSTRUCTION & TRANSPORT",
+  name: "RVP Anna Construction & Transport",
   shortName: "RVP ANNA",
   tagline: "BUILD WITH CLARITY. MOVE WITH CONFIDENCE.",
   descriptor: "Civil Engineer · Construction, Planning, Materials & Transport",
@@ -67,12 +67,12 @@ export const siteConfig: BusinessInfo = {
 
 export const businessStructuredData = {
   "@context": "https://schema.org",
-  "@type": ["HomeAndConstructionBusiness", "GeneralContractor"],
+  "@type": ["LocalBusiness", "HomeAndConstructionBusiness", "GeneralContractor"],
   "@id": "https://www.rvpannaconstructionandtransport.com/#business",
   name: siteConfig.name,
   alternateName: siteConfig.shortName,
   url: siteConfig.url,
-  logo: siteConfig.ogImage,
+  logo: "https://www.rvpannaconstructionandtransport.com/logo.png",
   image: siteConfig.ogImage,
   description: siteConfig.description,
   telephone: siteConfig.phoneRaw,
@@ -155,7 +155,7 @@ export const businessStructuredData = {
           "@type": "Service",
           name: "Material Contract",
           description:
-            "Direct site supply of essential civil construction materials including TMT steel, cement, M-sand, Jelly gravel aggregate, and AAC blocks.",
+            "Direct site supply of essential civil construction materials including TMT steel, cement, M-sand, jalli gravel aggregate, and AAC blocks.",
         },
       },
       {

@@ -73,9 +73,9 @@ export const services: ServiceItem[] = [
     label: "Material Contract",
     title: "Building Material Supply",
     description:
-      "Direct site supply of essential construction materials including TMT steel, cement, M-sand, Jelly gravel aggregate, and AAC blocks.",
+      "Direct site supply of essential construction materials including TMT steel, cement, M-sand, jalli gravel aggregate, and AAC blocks.",
     image: serviceMaterialImage,
-    scopeMeta: "TMT Steel · Cement · M-Sand · Jelly · AAC Blocks",
+    scopeMeta: "TMT Steel · Cement · M-Sand · jalli · AAC Blocks",
     ctaText: "Discuss materials",
     enquiryValue: "Materials",
   },
@@ -97,7 +97,7 @@ export const services: ServiceItem[] = [
     label: "Transport",
     title: "Material Transport & Site Logistics",
     description:
-      "Dedicated transport support for moving steel, cement, Jelly, sand, and construction supplies directly to job sites in Walajabad and Kanchipuram.",
+      "Dedicated transport support for moving steel, cement, jalli, sand, and construction supplies directly to job sites in Walajabad and Kanchipuram.",
     image: serviceTransportImage,
     scopeMeta: "Material Movement · Site Delivery · Local Transport",
     ctaText: "Arrange transport",

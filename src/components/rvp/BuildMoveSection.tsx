@@ -61,7 +61,7 @@ export function BuildMoveSection() {
             <div className="mt-3 h-0.5 w-12 bg-highlight" />
             <p className="mt-5 max-w-md text-sm md:text-base leading-relaxed text-primary-foreground/80">
               Transport is an essential part of keeping a construction site productive. Dedicated
-              vehicle support ensures steel, cement, Jelly, and sand reach the site on schedule.
+              vehicle support ensures steel, cement, jalli, and sand reach the site on schedule.
             </p>
           </div>
         </SlideInRight>
