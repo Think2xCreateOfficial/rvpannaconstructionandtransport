@@ -5,13 +5,14 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import { NotFoundPage } from "@/components/rvp/NotFoundPage";
 import { siteConfig } from "@/data/siteConfig";
 import appCss from "../styles.css?url";
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error("Application Error Boundary caught error:", error);
   const router = useRouter();
 
