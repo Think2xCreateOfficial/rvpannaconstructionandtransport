@@ -17,7 +17,7 @@ export function WorkShowcase({ onSelectProject }: WorkShowcaseProps) {
   const item5 = galleryItems[4]!;
   const item6 = galleryItems[5]!;
 
-  // Prepare card items for mobile scrollable card stack
+  // Prepare card items for mobile architectural gallery
   const mobileCardItems: CardItem[] = galleryItems.map((item) => ({
     id: item.id,
     name: item.title,
@@ -25,6 +25,9 @@ export function WorkShowcase({ onSelectProject }: WorkShowcaseProps) {
     image: item.image,
     avatar: "/favicon-96x96.png",
     href: "#enquire",
+    number: item.number,
+    scope: item.scope,
+    description: item.description,
   }));
 
   return (

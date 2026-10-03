@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import { NotFoundPage } from "@/components/rvp/NotFoundPage";
-import { siteConfig, businessStructuredData } from "@/data/siteConfig";
+import { siteConfig } from "@/data/siteConfig";
 import appCss from "../styles.css?url";
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
@@ -53,40 +53,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      {
-        title: siteConfig.title,
-      },
-      {
-        name: "description",
-        content: siteConfig.description,
-      },
       { name: "author", content: `${siteConfig.proprietor} · ${siteConfig.name}` },
       { name: "theme-color", content: "#071A2B" },
-      { property: "og:type", content: "website" },
-      { property: "og:locale", content: "en_IN" },
-      { property: "og:site_name", content: siteConfig.name },
-      {
-        property: "og:title",
-        content: siteConfig.title,
-      },
-      {
-        property: "og:description",
-        content: siteConfig.description,
-      },
-      { property: "og:image", content: siteConfig.ogImage },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:url", content: siteConfig.url },
-      { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:title",
-        content: siteConfig.title,
-      },
-      {
-        name: "twitter:description",
-        content: siteConfig.description,
-      },
-      { name: "twitter:image", content: siteConfig.ogImage },
     ],
     links: [
       {
@@ -103,13 +71,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.png", type: "image/png", sizes: "192x192" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "manifest", href: "/site.webmanifest" },
-      { rel: "canonical", href: siteConfig.url },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify(businessStructuredData),
-      },
     ],
   }),
   shellComponent: RootShell,

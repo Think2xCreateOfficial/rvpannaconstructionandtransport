@@ -1,30 +1,20 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion, useMotionValue, useReducedMotion, type PanInfo } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const SCROLL_TIMEOUT_OFFSET = 80;
-const MIN_SCROLL_INTERVAL = 250;
-const SCROLL_THRESHOLD = 20;
-const SCALE_FACTOR = 0.07;
-const MIN_SCALE = 0.1;
-const MAX_SCALE = 2;
-const HOVER_SCALE_MULTIPLIER = 1.02;
-const CARD_PADDING = 110;
-
-const FRAME_OFFSET = -22;
-const FRAMES_VISIBLE_LENGTH = 3;
-const SNAP_DISTANCE = 50;
-
 export interface CardItem {
-  avatar: string;
+  avatar?: string;
+  description?: string;
   handle: string;
-  href: string;
+  href?: string;
   id: string;
   image: string;
   name: string;
+  number?: string;
+  scope?: string;
 }
 
 export interface ScrollableCardStackProps {
@@ -36,396 +26,389 @@ export interface ScrollableCardStackProps {
   onSelectCard?: (item: CardItem) => void;
 }
 
+const SWIPE_THRESHOLD_PX = 36;
+const SWIPE_VELOCITY_THRESHOLD = 0.3;
+const ANIMATION_DURATION_MS = 320;
+
 export const ScrollableCardStack: React.FC<ScrollableCardStackProps> = ({
   items,
-  cardHeight = 320,
-  perspective = 1000,
-  transitionDuration = 200,
   className,
   onSelectCard,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [dragDeltaX, setDragDeltaX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scrollY = useMotionValue(0);
-  const lastScrollTime = useRef(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
   const totalItems = items.length;
-  const maxIndex = totalItems - 1;
+  const maxIndex = Math.max(0, totalItems - 1);
 
-  const clamp = useCallback(
-    (val: number, [min, max]: [number, number]): number => Math.min(Math.max(val, min), max),
-    [],
-  );
+  // Gesture tracking refs
+  const startXRef = useRef(0);
+  const startYRef = useRef(0);
+  const startTimeRef = useRef(0);
+  const directionLockedRef = useRef<"horizontal" | "vertical" | null>(null);
+  const activePointerIdRef = useRef<number | null>(null);
+  const animTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const scrollToCard = useCallback(
-    (direction: 1 | -1) => {
-      const now = Date.now();
-      const timeSinceLastScroll = now - lastScrollTime.current;
+  // Preload and decode cache to guarantee no blank/flash frames
+  const decodedSetRef = useRef<Set<string>>(new Set());
 
-      if (timeSinceLastScroll < 140) {
-        return;
-      }
-
-      const newIndex = clamp(currentIndex + direction, [0, maxIndex]);
-
-      if (newIndex !== currentIndex) {
-        lastScrollTime.current = now;
-        setIsScrolling(true);
-        setCurrentIndex(newIndex);
-        scrollY.set(newIndex * SNAP_DISTANCE);
-
-        setTimeout(() => {
-          setIsScrolling(false);
-        }, 150);
-      }
-    },
-    [currentIndex, maxIndex, scrollY, clamp],
-  );
-
-  const goToCard = useCallback(
-    (index: number) => {
-      if (isScrolling || index === currentIndex) {
-        return;
-      }
-      const targetIndex = clamp(index, [0, maxIndex]);
-      setIsScrolling(true);
-      setCurrentIndex(targetIndex);
-      scrollY.set(targetIndex * SNAP_DISTANCE);
-
-      setTimeout(() => {
-        setIsScrolling(false);
-      }, transitionDuration + SCROLL_TIMEOUT_OFFSET);
-    },
-    [currentIndex, isScrolling, maxIndex, scrollY, transitionDuration, clamp],
-  );
-
-  // Wheel event for desktop / trackpads
-  const handleScroll = useCallback(
-    (deltaY: number) => {
-      if (isDragging || isScrolling) {
-        return;
-      }
-
-      if (Math.abs(deltaY) < SCROLL_THRESHOLD) {
-        return;
-      }
-
-      const scrollDirection = deltaY > 0 ? 1 : -1;
-      scrollToCard(scrollDirection);
-    },
-    [isDragging, isScrolling, scrollToCard],
-  );
-
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > 15) {
-        handleScroll(e.deltaY);
-      }
-    },
-    [handleScroll],
-  );
-
-  // Keyboard navigation
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (isScrolling) {
-        return;
-      }
-
-      switch (e.key) {
-        case "ArrowUp":
-        case "ArrowLeft": {
-          e.preventDefault();
-          scrollToCard(-1);
-          break;
-        }
-        case "ArrowDown":
-        case "ArrowRight": {
-          e.preventDefault();
-          scrollToCard(1);
-          break;
-        }
-        case "Home": {
-          e.preventDefault();
-          goToCard(0);
-          break;
-        }
-        case "End": {
-          e.preventDefault();
-          goToCard(maxIndex);
-          break;
-        }
-      }
-    },
-    [goToCard, isScrolling, maxIndex, scrollToCard],
-  );
-
-  // Framer motion drag gesture handler for mobile swipe
-  const handleDragEnd = useCallback(
-    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-      setIsDragging(false);
-      const swipeThreshold = 25;
-      const velocityThreshold = 180;
-
-      if (info.offset.x < -swipeThreshold || info.velocity.x < -velocityThreshold) {
-        scrollToCard(1);
-      } else if (info.offset.x > swipeThreshold || info.velocity.x > velocityThreshold) {
-        scrollToCard(-1);
-      }
-    },
-    [scrollToCard],
-  );
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) {
+  const preloadAndDecode = useCallback((src: string) => {
+    if (!src || decodedSetRef.current.has(src) || typeof window === "undefined") {
       return;
     }
-
-    container.addEventListener("wheel", handleWheel, { passive: true });
-    return () => {
-      container.removeEventListener("wheel", handleWheel);
-    };
-  }, [handleWheel]);
-
-  useEffect(() => {
-    if (!isDragging) {
-      scrollY.set(currentIndex * SNAP_DISTANCE);
-    }
-  }, [currentIndex, isDragging, scrollY]);
-
-  const getCardTransform = useCallback(
-    (index: number) => {
-      const offsetIndex = index - currentIndex;
-      const isBehindCurrent = currentIndex > index;
-      const blur = !shouldReduceMotion && isBehindCurrent ? 2 : 0;
-      const opacity = currentIndex > index ? 0 : 1;
-
-      const scale = shouldReduceMotion
-        ? 1
-        : clamp(1 - offsetIndex * SCALE_FACTOR, [MIN_SCALE, MAX_SCALE]);
-
-      const y = shouldReduceMotion
-        ? 0
-        : clamp(offsetIndex * FRAME_OFFSET, [
-            FRAME_OFFSET * FRAMES_VISIBLE_LENGTH,
-            Number.POSITIVE_INFINITY,
-          ]);
-
-      const zIndex = items.length - index;
-
-      return {
-        blur,
-        opacity,
-        scale,
-        y,
-        zIndex,
+    const img = new Image();
+    img.src = src;
+    if (typeof img.decode === "function") {
+      img
+        .decode()
+        .then(() => {
+          decodedSetRef.current.add(src);
+        })
+        .catch(() => {
+          decodedSetRef.current.add(src);
+        });
+    } else {
+      (img as HTMLImageElement).onload = () => {
+        decodedSetRef.current.add(src);
       };
+    }
+  }, []);
+
+  // Preload current, next, and previous image ahead of time
+  useEffect(() => {
+    if (!items || items.length === 0) return;
+    const curr = items[currentIndex];
+    const next = items[Math.min(currentIndex + 1, maxIndex)];
+    const prev = items[Math.max(currentIndex - 1, 0)];
+
+    if (curr?.image) preloadAndDecode(curr.image);
+    if (next?.image) preloadAndDecode(next.image);
+    if (prev?.image) preloadAndDecode(prev.image);
+  }, [currentIndex, items, maxIndex, preloadAndDecode]);
+
+  // Clean up animation timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (animTimeoutRef.current) {
+        clearTimeout(animTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const goToCard = useCallback(
+    (targetIndex: number) => {
+      const clamped = Math.max(0, Math.min(targetIndex, maxIndex));
+      if (clamped === currentIndex) {
+        setDragDeltaX(0);
+        setIsDragging(false);
+        return;
+      }
+
+      if (shouldReduceMotion) {
+        setCurrentIndex(clamped);
+        setDragDeltaX(0);
+        setIsDragging(false);
+        setIsAnimating(false);
+        return;
+      }
+
+      setIsAnimating(true);
+      setCurrentIndex(clamped);
+      setDragDeltaX(0);
+      setIsDragging(false);
+
+      if (animTimeoutRef.current) {
+        clearTimeout(animTimeoutRef.current);
+      }
+      animTimeoutRef.current = setTimeout(() => {
+        setIsAnimating(false);
+      }, ANIMATION_DURATION_MS + 40);
     },
-    [currentIndex, items.length, clamp, shouldReduceMotion],
+    [currentIndex, maxIndex, shouldReduceMotion],
   );
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!e.isPrimary || e.button !== 0) return;
+    if (isAnimating) return;
+
+    startXRef.current = e.clientX;
+    startYRef.current = e.clientY;
+    startTimeRef.current = Date.now();
+    directionLockedRef.current = null;
+    activePointerIdRef.current = e.pointerId;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointerIdRef.current !== e.pointerId) return;
+
+    const dx = e.clientX - startXRef.current;
+    const dy = e.clientY - startYRef.current;
+
+    if (directionLockedRef.current === null) {
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+      if (absDx > 6 || absDy > 6) {
+        if (absDx > absDy) {
+          directionLockedRef.current = "horizontal";
+          setIsDragging(true);
+          try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+          } catch {
+            // Safe fallback for older WebKit
+          }
+        } else {
+          directionLockedRef.current = "vertical";
+          activePointerIdRef.current = null;
+          return;
+        }
+      }
+    }
+
+    if (directionLockedRef.current === "horizontal") {
+      // Gentle rubber-banding at boundary edges
+      if ((currentIndex === 0 && dx > 0) || (currentIndex === maxIndex && dx < 0)) {
+        setDragDeltaX(dx * 0.28);
+      } else {
+        setDragDeltaX(dx);
+      }
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointerIdRef.current !== e.pointerId) return;
+
+    if (directionLockedRef.current === "horizontal") {
+      try {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+      } catch {
+        // Safe fallback
+      }
+
+      const dx = e.clientX - startXRef.current;
+      const dt = Math.max(1, Date.now() - startTimeRef.current);
+      const velocity = dx / dt;
+
+      if (dx < -SWIPE_THRESHOLD_PX || velocity < -SWIPE_VELOCITY_THRESHOLD) {
+        if (currentIndex < maxIndex) {
+          goToCard(currentIndex + 1);
+        } else {
+          goToCard(currentIndex);
+        }
+      } else if (dx > SWIPE_THRESHOLD_PX || velocity > SWIPE_VELOCITY_THRESHOLD) {
+        if (currentIndex > 0) {
+          goToCard(currentIndex - 1);
+        } else {
+          goToCard(currentIndex);
+        }
+      } else {
+        goToCard(currentIndex);
+      }
+    }
+
+    activePointerIdRef.current = null;
+    directionLockedRef.current = null;
+    setIsDragging(false);
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointerIdRef.current === e.pointerId) {
+      activePointerIdRef.current = null;
+      directionLockedRef.current = null;
+      setIsDragging(false);
+      setDragDeltaX(0);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (isAnimating) return;
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      goToCard(currentIndex - 1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      goToCard(currentIndex + 1);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      goToCard(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      goToCard(maxIndex);
+    }
+  };
+
+  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setIsAnimating(false);
+    }
+  };
+
+  const activeItem = items[currentIndex];
+
+  const trackTransform = isDragging
+    ? `translate3d(calc(-${currentIndex * 100}% + ${dragDeltaX}px), 0, 0)`
+    : `translate3d(-${currentIndex * 100}%, 0, 0)`;
+
+  const trackTransition =
+    isDragging || shouldReduceMotion
+      ? "none"
+      : isAnimating
+        ? `transform ${ANIMATION_DURATION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
+        : "none";
+
+  if (!items || items.length === 0) {
+    return null;
+  }
 
   return (
     <section
       aria-atomic="true"
-      aria-label="Scrollable construction card stack"
+      aria-label="Mobile construction project documentation gallery"
       aria-live="polite"
-      className={cn("relative mx-auto w-full max-w-[340px] sm:max-w-sm select-none", className)}
+      className={cn("relative mx-auto w-full max-w-lg select-none", className)}
     >
-      {/* 3D Card Stack Container */}
+      {/* 1. Header Meta Bar (Synchronous with active image) */}
+      <div className="mb-3 flex flex-col gap-1 text-left px-0.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-highlight">
+            {activeItem?.number || String(currentIndex + 1).padStart(2, "0")} /{" "}
+            {String(totalItems).padStart(2, "0")} · {activeItem?.handle}
+          </span>
+          {activeItem?.scope && (
+            <span className="font-mono text-[11px] text-primary-foreground/60 hidden xs:inline truncate max-w-[190px]">
+              {activeItem.scope}
+            </span>
+          )}
+        </div>
+        <h3 className="text-base sm:text-lg font-extrabold tracking-tight text-primary-foreground line-clamp-1">
+          {activeItem?.name}
+        </h3>
+      </div>
+
+      {/* 2. Stable Clipping Container & Viewport */}
       <div
-        aria-label="Scrollable card container"
-        className="relative h-full w-full touch-pan-y"
+        className="relative w-full aspect-[4/3] overflow-hidden border border-background/20 bg-primary-soft shadow-xl touch-pan-y focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-highlight"
         onKeyDown={handleKeyDown}
-        ref={containerRef}
-        role="application"
-        style={{
-          minHeight: `${cardHeight + CARD_PADDING}px`,
-          perspective: `${perspective}px`,
-          perspectiveOrigin: "center 55%",
-        }}
+        onPointerCancel={handlePointerCancel}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Construction photographs"
         tabIndex={0}
       >
-        {items.map((item, i) => {
-          const transform = getCardTransform(i);
-          const isActive = i === currentIndex;
-          const isHovered = hoveredIndex === i;
+        {/* Continuous Horizontal Hardware-Accelerated Track */}
+        <div
+          className="flex flex-row h-full w-full"
+          onTransitionEnd={handleTransitionEnd}
+          style={{
+            transform: trackTransform,
+            transition: trackTransition,
+            willChange: isDragging || isAnimating ? "transform" : "auto",
+          }}
+        >
+          {items.map((item, index) => {
+            const isCurrent = index === currentIndex;
 
-          return (
-            <motion.div
-              animate={
-                shouldReduceMotion
-                  ? { opacity: transform.opacity }
-                  : {
-                      scale: transform.scale,
-                      y: `calc(-50% + ${transform.y}px)`,
-                      opacity: transform.opacity,
-                    }
-              }
-              aria-hidden={!isActive}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-[320px] sm:max-w-[340px] overflow-hidden border border-background/25 bg-card shadow-xl transition-shadow cursor-grab active:cursor-grabbing"
-              data-active={isActive}
-              drag={isActive ? "x" : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.25}
-              dragSnapToOrigin={true}
-              initial={false}
-              key={`scrollable-card-${item.id}`}
-              onBlur={() => setHoveredIndex(null)}
-              onDragEnd={isActive ? handleDragEnd : () => {}}
-              onDragStart={() => setIsDragging(true)}
-              onFocus={() => isActive && setHoveredIndex(i)}
-              onMouseEnter={() => isActive && setHoveredIndex(i)}
-              onMouseLeave={() => setHoveredIndex(null)}
-              style={{
-                borderWidth: `${2 / transform.scale}px`,
-                filter: `blur(${transform.blur}px)`,
-                height: `${cardHeight}px`,
-                opacity: transform.opacity,
-                pointerEvents: isActive ? "auto" : "none",
-                transformOrigin: "center center",
-                transitionDuration: shouldReduceMotion ? "0ms" : "220ms",
-                transitionProperty: shouldReduceMotion ? "none" : "opacity, filter",
-                transitionTimingFunction: "cubic-bezier(0.645, 0.045, 0.355, 1)",
-                willChange: shouldReduceMotion ? undefined : "opacity, filter, transform",
-                zIndex: transform.zIndex,
-              }}
-              tabIndex={isActive ? 0 : -1}
-              transition={
-                shouldReduceMotion
-                  ? { duration: 0 }
-                  : {
-                      damping: 24,
-                      duration: 0.25,
-                      mass: 0.5,
-                      stiffness: 280,
-                      type: "spring" as const,
-                    }
-              }
-              whileHover={
-                shouldReduceMotion || !isActive
-                  ? {}
-                  : {
-                      scale: transform.scale * HOVER_SCALE_MULTIPLIER,
-                    }
-              }
-            >
-              {/* Card Content */}
+            return (
               <div
-                className={cn(
-                  "flex h-full w-full flex-col bg-primary-soft transition-all duration-200",
-                  isHovered && "shadow-xl",
-                  isScrolling && isActive && "ring-2 ring-highlight ring-opacity-60",
-                )}
-                style={{ height: `${cardHeight}px` }}
+                key={`mobile-gallery-slide-${item.id}`}
+                className="relative h-full w-full min-w-full shrink-0 overflow-hidden bg-primary cursor-pointer"
+                onClick={() => {
+                  if (Math.abs(dragDeltaX) < 6) {
+                    onSelectCard?.(item);
+                  }
+                }}
+                aria-hidden={!isCurrent}
+                aria-label={`${item.name} (${index + 1} of ${totalItems})`}
+                role="group"
+                aria-roledescription="slide"
               >
-                {/* Image Container */}
-                <div
-                  className="relative w-full flex-1 overflow-hidden bg-primary cursor-pointer"
-                  onClick={() => onSelectCard?.(item)}
-                >
-                  <img
-                    alt={item.name}
-                    className="absolute inset-0 size-full object-cover pointer-events-none"
-                    decoding="async"
-                    draggable={false}
-                    src={item.image}
-                  />
-                  <div className="absolute inset-0 bg-image-fade pointer-events-none" />
-
-                  {/* Card Index Pill on Top Left */}
-                  {/* <div className="absolute top-2.5 left-2.5 border border-background/20 bg-primary/85 px-2 py-0.5 font-mono text-[10px] font-bold text-highlight backdrop-blur-sm">
-                    {String(i + 1).padStart(2, "0")} / {String(totalItems).padStart(2, "0")}
-                  </div> */}
-                </div>
-
-                {/* Info Bar at Bottom */}
-                {/* <div
-                  onClick={() => onSelectCard?.(item)}
-                  className="flex items-center justify-between border-t border-background/20 bg-primary/95 p-3 text-primary-foreground backdrop-blur-sm cursor-pointer"
-                >
-                  <div className="flex flex-col truncate pr-2 text-left">
-                    <span className="font-bold text-xs leading-snug truncate text-primary-foreground">
-                      {item.name}
-                    </span>
-                    <span className="font-mono text-[10px] text-highlight uppercase tracking-wider">
-                      {item.handle}
-                    </span>
-                  </div>
-
-                  <a
-                    href={item.href}
-                    className="inline-flex size-7 shrink-0 items-center justify-center border border-background/25 text-highlight bg-primary hover:bg-highlight hover:text-highlight-foreground transition-colors"
-                    aria-label={`Select ${item.name}`}
-                  >
-                    <span className="text-xs font-mono font-bold">→</span>
-                  </a>
-                </div> */}
-              </div>
-            </motion.div>
-          );
-        })}
-
-        {/* Navigation Controls: Left/Right Buttons & Dots */}
-        <div className="absolute bottom-1 left-0 right-0 flex items-center justify-between px-2">
-          {/* Previous Card Button */}
-          <button
-            type="button"
-            onClick={() => scrollToCard(-1)}
-            disabled={currentIndex === 0}
-            className="flex size-11 items-center justify-center border border-background/20 bg-primary/80 text-highlight backdrop-blur-sm transition-all disabled:opacity-30 disabled:pointer-events-none hover:border-highlight hover:bg-primary"
-            aria-label="Previous card"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
-
-          {/* Dots Indicator */}
-          <div
-            aria-label="Card navigation"
-            className="flex items-center justify-center gap-1.5"
-            role="tablist"
-          >
-            {Array.from({ length: items.length }, (_, i) => (
-              <button
-                key={`scrollable-indicator-${items[i]?.id || i}`}
-                type="button"
-                role="tab"
-                aria-label={`Go to card ${i + 1} of ${items.length}`}
-                aria-selected={i === currentIndex}
-                onClick={() => goToCard(i)}
-                className="flex size-8 items-center justify-center p-0 cursor-pointer focus:outline-none"
-              >
-                <span
-                  className={cn(
-                    "block transition-all duration-200",
-                    i === currentIndex
-                      ? "h-2 w-5 bg-highlight"
-                      : "size-1.5 bg-background/40 hover:bg-background/70",
-                  )}
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="size-full object-cover select-none pointer-events-none"
+                  draggable={false}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  fetchPriority={index === 0 ? "high" : "auto"}
+                  decoding="async"
                 />
-              </button>
-            ))}
-          </div>
 
-          {/* Next Card Button */}
-          <button
-            type="button"
-            onClick={() => scrollToCard(1)}
-            disabled={currentIndex === maxIndex}
-            className="flex size-11 items-center justify-center border border-background/20 bg-primary/80 text-highlight backdrop-blur-sm transition-all disabled:opacity-30 disabled:pointer-events-none hover:border-highlight hover:bg-primary"
-            aria-label="Next card"
+                {/* Subtle gradient vignette at bottom for text contrast */}
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent pointer-events-none" />
+
+                {/* Bottom Overlay Pills */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                  <span className="inline-flex items-center gap-1.5 border border-background/25 bg-primary/90 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-highlight backdrop-blur-sm">
+                    <span className="size-1.5 rounded-full bg-highlight" />
+                    {item.handle}
+                  </span>
+
+                  <span className="inline-flex items-center gap-1 border border-background/25 bg-primary/90 px-2 py-0.5 font-mono text-[10px] font-semibold text-primary-foreground/90 backdrop-blur-sm">
+                    Enquire →
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Architectural Navigation Controls & Progress Indicator */}
+      <div className="mt-3 flex items-center justify-between gap-3 px-0.5">
+        {/* Previous Card Button (44x44px minimum touch target) */}
+        <button
+          type="button"
+          onClick={() => goToCard(currentIndex - 1)}
+          disabled={currentIndex === 0 || isAnimating}
+          className="flex size-11 shrink-0 items-center justify-center border border-background/20 bg-primary/80 text-highlight backdrop-blur-sm transition-all disabled:opacity-25 disabled:pointer-events-none hover:border-highlight hover:bg-primary active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-highlight"
+          aria-label="Previous photograph"
+        >
+          <ChevronLeft className="size-4" />
+        </button>
+
+        {/* Minimal Architectural Progress Bar */}
+        <div className="flex flex-1 flex-col items-center gap-1.5 px-2">
+          <div
+            className="h-1 w-full bg-background/20 overflow-hidden relative"
+            role="progressbar"
+            aria-valuenow={currentIndex + 1}
+            aria-valuemin={1}
+            aria-valuemax={totalItems}
+            aria-label={`Photograph ${currentIndex + 1} of ${totalItems}`}
           >
-            <ChevronRight className="size-4" />
-          </button>
+            <div
+              className="h-full bg-highlight transition-all duration-300 ease-out"
+              style={{
+                width: `${((currentIndex + 1) / totalItems) * 100}%`,
+              }}
+            />
+          </div>
+          <span className="font-mono text-[10px] tracking-wider uppercase text-primary-foreground/60">
+            Swipe or tap to view
+          </span>
         </div>
 
-        <div aria-live="polite" className="sr-only">
-          {`Card ${currentIndex + 1} of ${items.length} selected. Swipe or use arrow keys to navigate.`}
-        </div>
+        {/* Next Card Button (44x44px minimum touch target) */}
+        <button
+          type="button"
+          onClick={() => goToCard(currentIndex + 1)}
+          disabled={currentIndex === maxIndex || isAnimating}
+          className="flex size-11 shrink-0 items-center justify-center border border-background/20 bg-primary/80 text-highlight backdrop-blur-sm transition-all disabled:opacity-25 disabled:pointer-events-none hover:border-highlight hover:bg-primary active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-highlight"
+          aria-label="Next photograph"
+        >
+          <ChevronRight className="size-4" />
+        </button>
+      </div>
+
+      {/* Screen Reader Announcement */}
+      <div aria-live="polite" className="sr-only">
+        {`Photograph ${currentIndex + 1} of ${totalItems}: ${activeItem?.name}. Swipe or use arrow keys to navigate.`}
       </div>
     </section>
   );

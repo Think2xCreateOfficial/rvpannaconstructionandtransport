@@ -25,6 +25,9 @@ export interface BusinessInfo {
   ogTitle: string;
   ogDescription: string;
   ogImage: string;
+  ogImageWidth: string;
+  ogImageHeight: string;
+  ogImageAlt: string;
 }
 
 export const siteConfig: BusinessInfo = {
@@ -58,11 +61,14 @@ export const siteConfig: BusinessInfo = {
   origin: "https://www.rvpannaconstructionandtransport.com",
   title: "RVP Anna Construction & Transport | Walajabad, Kanchipuram",
   description:
-    "Civil engineering construction, architectural 2D and 3D planning, elevation design, building material supply, labour coordination, and site transport in Walajabad and Kanchipuram.",
+    "RVP Anna Construction & Transport provides construction, planning, material, labour and transport support around Walajabad and Kanchipuram.",
   ogTitle: "RVP Anna Construction & Transport | Walajabad, Kanchipuram",
   ogDescription:
-    "Civil engineering construction, architectural 2D and 3D planning, elevation design, building material supply, labour coordination, and site transport in Walajabad and Kanchipuram.",
-  ogImage: "https://www.rvpannaconstructionandtransport.com/rvp-anna-logo.png",
+    "RVP Anna Construction & Transport provides construction, planning, material, labour and transport support around Walajabad and Kanchipuram.",
+  ogImage: "https://www.rvpannaconstructionandtransport.com/og-image.png",
+  ogImageWidth: "1200",
+  ogImageHeight: "630",
+  ogImageAlt: "RVP Anna Construction & Transport, Walajabad, Kanchipuram",
 };
 
 export const businessStructuredData = {

@@ -11,7 +11,11 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart(),
     nitro({
-      preset: process.env.NITRO_PRESET || (process.env.VERCEL ? "vercel" : undefined),
+      ...(process.env["NITRO_PRESET"]
+        ? { preset: process.env["NITRO_PRESET"] as "node-server" }
+        : process.env["VERCEL"]
+          ? { preset: "vercel" }
+          : {}),
     }),
     react(),
   ],
