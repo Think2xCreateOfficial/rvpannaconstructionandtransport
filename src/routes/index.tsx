@@ -25,6 +25,8 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:url", content: siteConfig.url },
       { property: "og:image", content: siteConfig.ogImage },
+      { property: "og:image:secure_url", content: siteConfig.ogImageSecureUrl },
+      { property: "og:image:type", content: siteConfig.ogImageType },
       { property: "og:image:width", content: siteConfig.ogImageWidth },
       { property: "og:image:height", content: siteConfig.ogImageHeight },
       { property: "og:image:alt", content: siteConfig.ogImageAlt },
